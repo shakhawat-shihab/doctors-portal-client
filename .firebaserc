@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "doctor-portal-shs",
-    "Doctor": "doctor-portal-shs"
+    "Doctor": "doctor-portal-shs",
+    "doctor": "doctor-portal-shs"
   },
   "targets": {}
 }

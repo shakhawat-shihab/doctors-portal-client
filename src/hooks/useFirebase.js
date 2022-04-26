@@ -76,6 +76,7 @@ const useFirebase = () => {
                 getIdToken(user)
                     .then(idToken => {
                         setToken(idToken);
+                        console.log('print idToken = ', idToken);
                     })
             } else {
                 setUser({})

@@ -7,10 +7,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const Appointments = ({ date }) => {
     const { user, token } = useAuth();
-    const [appointments, setAppointments] = useState([])
+    const [appointments, setAppointments] = useState([]);
+    const history = useHistory();
 
     useEffect(() => {
         const url = `https://doctors-portal-shs.herokuapp.com/appointments?email=${user.email}&date=${date.toLocaleDateString()}`
@@ -19,13 +22,21 @@ const Appointments = ({ date }) => {
                 'authorization': `Bearer ${token}`
             }
         })
-            .then(res => res.json())
-            .then(data => setAppointments(data));
+            .then(res => {
+                if (res.status === 403) {
+                    history.push('/home');
+                }
+                return res.json();
+            })
+            .then(data => {
+                //console.log('data = ', data);
+                setAppointments(data)
+            });
     }, [date, user.email, token])
 
     return (
         <div>
-            <h2>Appointments: {appointments.length}</h2>
+            <h2>Appointments: {appointments?.length}</h2>
             <TableContainer component={Paper}>
                 <Table sx={{}} aria-label="Appointments table">
                     <TableHead>
@@ -37,7 +48,7 @@ const Appointments = ({ date }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {appointments.map((row) => (
+                        {appointments?.map((row) => (
                             <TableRow
                                 key={row._id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -47,7 +58,16 @@ const Appointments = ({ date }) => {
                                 </TableCell>
                                 <TableCell align="right">{row.time}</TableCell>
                                 <TableCell align="right">{row.serviceName}</TableCell>
-                                <TableCell align="right">{row.fat}</TableCell>
+                                <TableCell align="right">
+                                    {
+                                        row.payment ? "Paid" :
+                                            <Link to={`dashboard/payment/${row._id}`}>
+                                                <button>
+                                                    Pay Now
+                                                </button>
+                                            </Link>
+                                    }
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
